@@ -4,8 +4,8 @@
 # OVERVIEW
 API that receives and saves pdf file, extracts and saves its text, meta-data and named entities in local database.  
 API allows to retrieve text and meta-data of a pdf-file previously uploaded via its id.  
-No authentication required
-This manual is to be used without Docker container
+It is required to have AWS credentials information in the following path: 
+~/.aws/credentials  
 
 
 # MORE DETAILS
@@ -43,6 +43,8 @@ API_reading_pdf/
 
 
 # INSTALLATION (UBUNTU OS)
+
+Unzip the archive from the (link)[https://github.com/saprykins/API_reading_pdf_spacy_aws.git]   
 
 The application requires Python installed.  
 
@@ -83,6 +85,55 @@ Install the packages that application requires by typing in command line:
 ```
 pip install -r requirements.txt
 ```
+Type in command line the command below to install additional package:  
+```
+python -m spacy download en_core_web_sm
+```
+Configure your AWS Command Line Interface (AWS CLI) to use AWS resources from command line  
+Install AWS CLI by typing in command line  
+```
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"  
+```
+```
+unzip awscliv2.zip
+```
+```
+sudo ./aws/install
+```
+Provide "Access key ID" and "Secret access key" by typing in command line  
+```
+aws configure
+```
+In response you will have an invite to input your "Access key ID", then "Secret access key", then region.  
+* The instruction below will help you to create admin user with appropriate policies and programmatic access. To find out where to get this information, check the information below.  
+
+  You should open your AWS web console  
+
+  In search-bar type "IAM"  
+
+  In left verticla menu choose "users"
+
+  Click on button "add users"  
+
+  Type user name, for example "admin"  
+
+  Check on "Access key - Programmatic access"  
+
+  From 3 rectangles choose the one that states "Attach existing policies directly"  
+
+  Choose "AdministratorAccess"  
+
+  Click on "next: tags" in the right bottom corner  
+
+  Click on "next: review" in the right bottom corner  
+
+  Click on "create user" button
+
+  Copy "Access key ID" and past it in command line where aws configure was typed  
+
+  Copy "Secret access key" and past it in the same command line window  
+
+  When region is requested in command line, type "eu-central-1"
 
 
 # TUTORIAL
@@ -128,7 +179,7 @@ curl -sF file=@"sample.pdf" http://localhost:5000/documents
   ```
   where 1 is id number of the record in database.  
 
-* At this moment the pdf-file is saved in 'API_reading_pdf-develop/uploads' on your local machine, text and metadata are saved in local sqlite database.  
+* At this moment the pdf-file is saved in 'API_reading_pdf-develop/uploads' on your local machine, text, metadata and named entities are saved in local sqlite database.  
 
 * You should use this id to retrieve the information about the file.  
 
@@ -155,9 +206,14 @@ The standard response is in the following format:
   "file_id": "tpvtajdvrlrqdecv",
   "link_to_content": "http://localhost:5000/text/1.txt",
   "modification_date": "D:20080201104827-05'00'",
-  "named_entities": "Ginsberg, Bruynooghe, David McAllester, Don Geddis, Will Harvey, "
+  "named_entities_aws":"Stallman, Sussman, Gaschnig, Ginsberg, ","named_entities_spacy":"Ginsberg, Dynamic Backtracking, Bruynooghe, David McAllester, Selman et.al, McAllester, Mark Fox, Don Geddis, Will Harvey, Vipin Kumar, Scott Roy, Narinder Singh, Ari Jonsson, Dynamic Backtracking\n\nProof, "}
 }
 ```
+We can find names of authors and people in the lines that starts with "named_entities_**"  
+
+The line that starts with "named_entities_aws" contains named entities found by AWS service "Comprehend".  
+
+The line that starts with "named_entities_spacy" contains named entities found by SpaCy Python library.  
 
 Instead of curl, you can also retrieve metadata via web-browser  
 
@@ -170,74 +226,14 @@ Type in address line http://localhost:5000/documents/<document_id>
   http://localhost:5000/documents/1  
 
 
-## Get text  
+We can find names of authors and people in the lines that starts with "named_entities_**"  
 
-To retrive text from database, you need its document_id. Type the following in command line to retrieve it:  
-```
-curl -s http://localhost:5000/text/<document_id>.txt
-```
-* where document_id should be replaced by a number.  
+The line that starts with "named_entities_aws" contains named entities found by AWS service "Comprehend".  
 
-* In case you sent at least one file, you can retrieve metadata related to the record 1 in database by typing:  
-  ```
-  curl -s http://localhost:5000/text/1.txt
-  ```
-* Keep in mind ".txt" after <document_id>
-
-Standard response returns in the following format:  
-```
-{
-    "text": "text from pdf"
-}
-```
-
-Instead of curl, you can also retrieve text via web-browser  
-
-Type in address line http://localhost:5000/text/<document_id>.txt 
-
-* where document_id should be replaced by a number.  
-
-* In case you sent at least one file, you can retrieve metadata related to the record 1 in database by typing:  
-
-  http://localhost:5000/text/1.txt  
+The line that starts with "named_entities_spacy" contains named entities found by SpaCy Python library.  
 
 
 ## Stop the application
 
 To stop the application, type "ctr + C" in terminal window where it was launched or close the terminal window.  
 
-
-## Test the application
-
-To launch tests, go to the project's top-level directory "API_reading_pdf"  
-and launch the following commands
-Tests cover 97-98% of code    
-```
-export PYTHONPATH="venv/lib/python3.9/site-packages/"
-```
-```
-coverage run -m pytest
-```
-```
-coverage report
-```
-For more details, you can check what are the line numbers that were not covered in tests
-```
-coverage report -m
-```
-To create a detailed html report in "API_reading_pdf/htmlcov/index.html", type the following
-```
-coverage html
-```
-
-## Check code quality with Pylint
-
-To check if the style of code in files is pythonic you can use Pylint.  
-To do that stay in top-level directory "API_reading_pdf" and type
-```
-pylint ./flaskr
-```
-You can also check each file using  
-```
-pylint model.py
-```
