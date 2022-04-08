@@ -206,7 +206,8 @@ The standard response is in the following format:
   "file_id": "tpvtajdvrlrqdecv",
   "link_to_content": "http://localhost:5000/text/1.txt",
   "modification_date": "D:20080201104827-05'00'",
-  "named_entities_aws":"Stallman, Sussman, Gaschnig, Ginsberg, ","named_entities_spacy":"Ginsberg, Dynamic Backtracking, Bruynooghe, David McAllester, Selman et.al, McAllester, Mark Fox, Don Geddis, Will Harvey, Vipin Kumar, Scott Roy, Narinder Singh, Ari Jonsson, Dynamic Backtracking\n\nProof, "}
+  "named_entities_aws":"Stallman, Sussman, Gaschnig, Ginsberg, ",  
+  "named_entities_spacy":"Ginsberg, Dynamic Backtracking, Bruynooghe, David McAllester, Selman et.al, McAllester, Mark Fox, Don Geddis, Will Harvey, Vipin Kumar, Scott Roy, Narinder Singh, Ari Jonsson, Dynamic Backtracking\n\nProof, "}
 }
 ```
 We can find names of authors and people in the lines that starts with "named_entities_**"  
